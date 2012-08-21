@@ -2,6 +2,7 @@ import datetime, numpy, time, os
 import matplotlib 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+workingPath="/var/www/147120/stream-data/"
 
 def smoothListGaussian(list,degree=10):
         window=degree*2-1
@@ -26,7 +27,7 @@ def smoothListGaussian(list,degree=10):
 def loadData(fname="squelchLog.txt",lastHour=True):
 	print "extracting data...",
 	global mins,vals
-	f=open(fname)
+	f=open(workingPath+fname)
 	raw=f.read()
 	f.close()
 	mins,vals=[],[]
@@ -46,8 +47,8 @@ def barActivity(threshold,color,al):
 		else:
 			if start==None: continue
 			#plt.axvspan(start,mins[i],fc=color,ec='none',alpha=al)
-			plt.subplot(111).fill([start,start,mins[i],mins[i]],\
-			[0,60,60,0],fc=color,ec='none',alpha=al)
+			#plt.subplot(111).fill([start,start,mins[i],mins[i]],\
+			#[0,60,60,0],fc=color,ec='none',alpha=al)
 			start=None
 	return
 
@@ -73,15 +74,15 @@ def graph():
 	fig.subplots_adjust(left=0.11, bottom=0.25, right=.98)
 	#plt.show()
 	#raw_input()
-	plt.savefig("allTime.png",dpi=700./9.)
+	plt.savefig(workingPath+"allTime.png",dpi=700./9.)
 	print("lastHour.png,"),
 	plt.xlabel("Last Hour")
 	plt.axis([mins[-60],mins[-1],-5,65])
-	plt.savefig("lastHour.png",dpi=700./9.)
+	plt.savefig(workingPath+"lastHour.png",dpi=700./9.)
 	print("lastDay.png,"),
 	#plt.xlabel("Last 24 Hours")
 	#plt.axis([mins[-(60*24)],mins[-1],-5,65])
-	#plt.savefig("lastDay.png",dpi=700./9.)
+	#plt.savefig(workingPath+"lastDay.png",dpi=700./9.)
 	print "COMPLETE"
 
 def makeHTML():
@@ -122,14 +123,14 @@ can be downloaded from <a href="#">somewhere soon</a>.
 						(float(vals[i])/60.0*100.0)
 		htmlTable=line+htmlTable
 	html=html.replace("LINES",htmlTable)
-	f=open("pySquelch.html",'w')
+	f=open(workingPath+"pySquelch.html",'w')
 	f.write(html)
 	f.close()
 	print "COMPLETE"
 
 def analFile(fname):
 	threshold=200 # set this to suit your audio levels
-	dataY=numpy.memmap(fname, dtype='h', mode='r') #read PCM
+	dataY=numpy.memmap(workingPath+fname, dtype='h', mode='r') #read PCM
 	#print "LEN:",len(dataY),
 	dataY=dataY-numpy.average(dataY) #adjust the sound vertically
 	dataY=numpy.absolute(dataY) #no negative values
@@ -148,7 +149,7 @@ def analFile(fname):
 
 def updateLog(deleteToo=True):
 	print "checking for new slices..."
-	files=os.listdir ('./')
+	files=os.listdir (workingPath)
 	files.sort()
 	processed=0
 	for fname in files:
@@ -169,19 +170,26 @@ def updateLog(deleteToo=True):
 				# analyze (then delete) files over 2 minutes old
 				print "Processing",fileName,"...",
 				logLine="%d,%d\n"%(secFile,analFile(fileName))
-				f=open('squelchLog.txt','a')
+				f=open(workingPath+'squelchLog.txt','a')
 				f.write(logLine)
 				f.close()
 				if deleteToo: 
-					os.remove('./%s'%fname)
+					os.remove(workingPath+fileName)
 					print "logged and deleted"
 				else: print "logged -- AND KEPT ON DISK?!"
 	return processed
 
 
+deleteJunk=False
+if deleteJunk==True:
+	print "*SET TO DELETE AUDIO FILES ANALYSIS!*"
+	for i in range(2):
+		print 10-i,'...'
+		time.sleep(1)
+
 firstTime=True
 while True:
-	if updateLog()>0 or firstTime==True:
+	if updateLog(deleteJunk)>0 or firstTime==True:
 		print "re-plotting..."
 		loadData()
 		graph()
