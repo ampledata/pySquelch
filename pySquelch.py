@@ -2,7 +2,7 @@ import datetime, numpy, time, os
 import matplotlib 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-workingPath="/home/scott/Desktop/pySquelchPlayer/"
+workingPath="/var/www/147120/stream-data/"
 
 def smoothListGaussian(list,degree=10):
         window=degree*2-1
@@ -93,7 +93,8 @@ def graph():
 def makeHTML():
 	print "generating HTML output...",
 	global mins,vals
-	html="""<head><title>pySquelch Frequency Activity Analysis for:
+	html="""<head><meta HTTP-EQUIV='Refresh' CONTENT='60'>
+<title>pySquelch Frequency Activity Analysis for:
  147.120MHz (Orlando, FL)</title><style type="text/css">
 <!--
 body {
@@ -185,7 +186,7 @@ def updateLog(deleteToo=True):
 	return processed
 
 
-deleteJunk=False
+deleteJunk=True
 if deleteJunk==True:
 	print "*SET TO DELETE AUDIO FILES ANALYSIS!*"
 	for i in range(2):
