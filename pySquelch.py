@@ -2,7 +2,7 @@ import datetime, numpy, time, os
 import matplotlib 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-workingPath="/var/www/147120/stream-data/"
+workingPath="/home/scott/Desktop/pySquelchPlayer/"
 
 def smoothListGaussian(list,degree=10):
         window=degree*2-1
@@ -34,7 +34,12 @@ def loadData(fname="squelchLog.txt",lastHour=True):
 	for line in raw.split("\n"):
 		if len(line)<3 or "---" in line: continue
 		line = line.split(",")
-		mins.append(datetime.datetime.fromtimestamp(int(line[0])))
+		thisMin=datetime.datetime.fromtimestamp(int(line[0]))
+		if len(mins)>1:
+			if thisMin<mins[-1]: 
+				print("DUPLICATE DATA! USING MOST RECENT ONLY!")
+				mins,vals=[],[]
+		mins.append(thisMin)
 		vals.append(int(line[1]))
 	print "COMPLETE"
 	return [mins,vals]
