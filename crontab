@@ -1,0 +1,1 @@
+* * * * * root python /var/www/147120/stream-data/pySquelch_log.py > /dev/null 2>&1
