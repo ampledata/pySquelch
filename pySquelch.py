@@ -1,4 +1,7 @@
-import datetime,pylab, numpy, time, os
+import datetime, numpy, time, os
+import matplotlib 
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 
 def smoothListGaussian(list,degree=10):
         window=degree*2-1
@@ -12,11 +15,12 @@ def smoothListGaussian(list,degree=10):
         weight=numpy.array(weightGauss)*weight
         smoothed=[0.0]*(len(list)-window)
         for i in range(len(smoothed)):
-          smoothed[i]=sum(numpy.array(list[i:i+window])*weight)/sum(weight)
+			smoothed[i]=\
+			sum(numpy.array(list[i:i+window])*weight)/sum(weight)
         while len(list)>len(smoothed)+int(window/2):
-                smoothed.insert(0,None)
+			smoothed.insert(0,None)
         while len(list)>len(smoothed):
-				smoothed.append(None)
+			smoothed.append(None)
         return smoothed
 
 def loadData(fname="squelchLog.txt",lastHour=True):
@@ -41,7 +45,9 @@ def barActivity(threshold,color,al):
 			if start==None: start=mins[i]
 		else:
 			if start==None: continue
-			pylab.axvspan(start,mins[i],fc=color,ec='none',alpha=al)
+			#plt.axvspan(start,mins[i],fc=color,ec='none',alpha=al)
+			plt.subplot(111).fill([start,start,mins[i],mins[i]],\
+			[0,60,60,0],fc=color,ec='none',alpha=al)
 			start=None
 	return
 
@@ -49,33 +55,33 @@ def graph():
 	print "graphing:",
 	global mins,vals,smooth
 	smooth=smoothListGaussian(vals)
-	fig=pylab.figure(figsize=(9,4))
-	ax=pylab.subplot(111)
+	fig=plt.figure(figsize=(9,4))
+	ax=plt.subplot(111)
 	print("allTime.png,"),
-	pylab.title("147.120 MHz Activity (updated: %s)"%\
+	plt.title("147.120 MHz Activity (updated: %s)"%\
 				str(datetime.datetime.now()).split(".")[0])
 	barActivity(5,'k',.1)
 	barActivity(50,'r',.2)
-	pylab.grid(alpha=.3)
-	pylab.plot(mins,vals,'k',alpha=.2,lw=1)
-	pylab.plot(mins,smooth,'b')
-	pylab.plot(mins,smoothListGaussian(vals,60),'g')
+	plt.grid(alpha=.3)
+	plt.plot(mins,vals,'k',alpha=.2,lw=1)
+	plt.plot(mins,smooth,'b')
+	plt.plot(mins,smoothListGaussian(vals,60),'g')
 	fig.autofmt_xdate()
-	pylab.ylabel("Seconds of Transmission per Minute")
-	pylab.xlabel("All Time")
-	pylab.axis([None,None,-5,65])
+	plt.ylabel("Seconds of Transmission per Minute")
+	plt.xlabel("All Time")
+	plt.axis([None,None,-5,65])
 	fig.subplots_adjust(left=0.11, bottom=0.25, right=.98)
-	#pylab.show()
+	#plt.show()
 	#raw_input()
-	pylab.savefig("allTime.png",dpi=700./9.)
+	plt.savefig("allTime.png",dpi=700./9.)
 	print("lastHour.png,"),
-	pylab.xlabel("Last Hour")
-	pylab.axis([mins[-60],mins[-1],-5,65])
-	pylab.savefig("lastHour.png",dpi=700./9.)
+	plt.xlabel("Last Hour")
+	plt.axis([mins[-60],mins[-1],-5,65])
+	plt.savefig("lastHour.png",dpi=700./9.)
 	print("lastDay.png,"),
-	#pylab.xlabel("Last 24 Hours")
-	#pylab.axis([mins[-(60*24)],mins[-1],-5,65])
-	#pylab.savefig("lastDay.png",dpi=700./9.)
+	#plt.xlabel("Last 24 Hours")
+	#plt.axis([mins[-(60*24)],mins[-1],-5,65])
+	#plt.savefig("lastDay.png",dpi=700./9.)
 	print "COMPLETE"
 
 def makeHTML():
@@ -89,13 +95,14 @@ font-size: 14px;
 font-family: Verdana, Arial, SunSans-Regular, Sans-Serif;
 text-align: center;
 }
---></style></head><body><h2>pySquelch Frequency Activity Report for:<br>
-147.120MHz (Orlando, FL)</h2><img src="lastHour.png"><br>
+--></style></head><body><h2>pySquelch Frequency Activity Report for:
+<br>147.120MHz (Orlando, FL)</h2><img src="lastHour.png"><br>
 <img src="allTime.png"><br>
 <table border=0 cellspacing=0 cellpadding=5 width=700 align="center">
 <tr><td style="background: #AAAAAA">RECENT ACTIVITY</td></tr>
 <tr><td style="background: #DDDDDD"><code>LINES</code></td></tr></table>
-<br><table border=0 cellspacing=0 cellpadding=5 width=700 align="center">
+<br>
+<table border=0 cellspacing=0 cellpadding=5 width=700 align="center">
 <tr><td>
 <b><a>pySquelch</a></b> Frequency Activity Analysis software was written
 by <a href="mailto:SWHarden@gmail.com">Scott Harden</a>
@@ -182,3 +189,4 @@ while True:
 		firstTime=False
 	print "sleeping...\n\n"
 	time.sleep(30)
+
