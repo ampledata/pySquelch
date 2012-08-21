@@ -52,8 +52,8 @@ def barActivity(threshold,color,al):
 		else:
 			if start==None: continue
 			#plt.axvspan(start,mins[i],fc=color,ec='none',alpha=al)
-			#plt.subplot(111).fill([start,start,mins[i],mins[i]],\
-			#[0,60,60,0],fc=color,ec='none',alpha=al)
+			plt.subplot(111).fill([start,start,mins[i],mins[i]],\
+			[0,60,60,0],fc=color,ec='none',alpha=al)
 			start=None
 	return
 
@@ -70,8 +70,8 @@ def graph():
 	barActivity(50,'r',.2)
 	plt.grid(alpha=.3)
 	plt.plot(mins,vals,'k',alpha=.2,lw=1)
-	plt.plot(mins,smooth,'b')
-	plt.plot(mins,smoothListGaussian(vals,60),'g')
+	plt.plot(mins[10:-10],smooth[10:-10],'b')
+	plt.plot(mins[60:-60],smoothListGaussian(vals,60)[60:-60],'g')
 	fig.autofmt_xdate()
 	plt.ylabel("Seconds of Transmission per Minute")
 	plt.xlabel("All Time")
@@ -80,14 +80,18 @@ def graph():
 	#plt.show()
 	#raw_input()
 	plt.savefig(workingPath+"allTime.png",dpi=700./9.)
+	os.popen('convert %sallTime.png %sallTime.jpg'%(workingPath,workingPath))
 	print("lastHour.png,"),
 	plt.xlabel("Last Hour")
 	plt.axis([mins[-60],mins[-1],-5,65])
 	plt.savefig(workingPath+"lastHour.png",dpi=700./9.)
+        os.popen('convert %slastHour.png %slastHour.jpg'%(workingPath,workingPath))
 	print("lastDay.png,"),
 	#plt.xlabel("Last 24 Hours")
 	#plt.axis([mins[-(60*24)],mins[-1],-5,65])
 	#plt.savefig(workingPath+"lastDay.png",dpi=700./9.)
+        #os.popen('convert %slastDay.png %slastDay.jpg'%(workingPath,workingPath))
+	plt.close('all')
 	print "COMPLETE"
 
 def makeHTML():
@@ -103,8 +107,8 @@ font-family: Verdana, Arial, SunSans-Regular, Sans-Serif;
 text-align: center;
 }
 --></style></head><body><h2>pySquelch Frequency Activity Report for:
-<br>147.120MHz (Orlando, FL)</h2><img src="lastHour.png"><br>
-<img src="allTime.png"><br>
+<br>147.120MHz (Orlando, FL)</h2><img src="lastHour.jpg"><br>
+<img src="allTime.jpg"><br>
 <table border=0 cellspacing=0 cellpadding=5 width=700 align="center">
 <tr><td style="background: #AAAAAA">RECENT ACTIVITY</td></tr>
 <tr><td style="background: #DDDDDD"><code>LINES</code></td></tr></table>
@@ -203,4 +207,5 @@ while True:
 		firstTime=False
 	print "sleeping...\n\n"
 	time.sleep(30)
+
 
